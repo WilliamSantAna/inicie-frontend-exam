@@ -1,0 +1,86 @@
+<div class="container">
+    <div class="kanban">
+        <div class="kanban-head">
+            <span>SGTI - Sistema Gerenciador de Tarefas Inicie</span>
+        </div>
+        <div class="kanban-board" cdkDropListGroup>
+            <div class="kanban-column pending-column"
+                cdkDropList 
+                #listPending="cdkDropList"
+                [cdkDropListConnectedTo]="[listInProgress]"
+                (cdkDropListDropped)="drop($event)"
+                [cdkDropListData]="pendingTasks">
+                <h2>Pendente</h2>
+                <mat-card *ngFor="let task of pendingTasks" cdkDrag [cdkDragData]="task" class="task">
+                    <mat-card-content>
+                        <ng-container *ngIf="!task.isEditing; else editMode">
+                            <h3 (click)="enableEditing(task, $event)">{{ task.title }}</h3>
+                        </ng-container>
+                        <ng-template #editMode>
+                            <mat-form-field appearance="outline" class="full-width">
+                                <input matInput [(ngModel)]="task.title" (keydown.enter)="updateTaskTitle(task)" (blur)="cancelEditing(task)" #titleInput (focus)="titleInput.select()" />
+                            </mat-form-field>
+                        </ng-template>
+                        <p class="created_at">{{ task.createdAt }}</p>
+                    </mat-card-content>
+                    <mat-card-actions>
+                        <button mat-button color="danger" (click)="deleteTask(task.id)">X</button>
+                    </mat-card-actions>
+                </mat-card>
+                <div class="add-task">
+                    <button mat-raised-button color="primary" (click)="addTask()">Nova Tarefa</button>
+                </div>
+            </div>
+    
+            <div class="kanban-column in-progress-column"
+                cdkDropList 
+                #listInProgress="cdkDropList"
+                [cdkDropListConnectedTo]="[listPending,listCompleted]"
+                (cdkDropListDropped)="drop($event)"
+                [cdkDropListData]="inProgressTasks">
+                <h2>Em andamento</h2>
+                <mat-card *ngFor="let task of inProgressTasks" cdkDrag [cdkDragData]="task" class="task">
+                    <mat-card-content>
+                        <ng-container *ngIf="!task.isEditing; else editMode">
+                            <h3 (click)="enableEditing(task, $event)">{{ task.title }}</h3>
+                        </ng-container>
+                        <ng-template #editMode>
+                            <mat-form-field appearance="outline" class="full-width">
+                                <input matInput [(ngModel)]="task.title" (keydown.enter)="updateTaskTitle(task)" (blur)="cancelEditing(task)" #titleInput (focus)="titleInput.select()" />
+                            </mat-form-field>
+                        </ng-template>
+                      <p class="created_at">{{ task.createdAt }}</p>
+                    </mat-card-content>
+                    <mat-card-actions>
+                        <button mat-button color="warn" (click)="deleteTask(task.id)">X</button>
+                    </mat-card-actions>
+                </mat-card>
+            </div>
+            
+            <div class="kanban-column completed-column"
+                cdkDropList 
+                #listCompleted="cdkDropList"
+                [cdkDropListConnectedTo]="[listInProgress]"
+                (cdkDropListDropped)="drop($event)"
+                [cdkDropListData]="completedTasks">
+                <h2>Completed</h2>
+                <mat-card *ngFor="let task of completedTasks" cdkDrag [cdkDragData]="task" class="task">
+                    <mat-card-content>
+                        <ng-container *ngIf="!task.isEditing; else editMode">
+                            <h3 (click)="enableEditing(task, $event)">{{ task.title }}</h3>
+                        </ng-container>
+                        <ng-template #editMode>
+                            <mat-form-field appearance="outline" class="full-width">
+                                <input matInput [(ngModel)]="task.title" (keydown.enter)="updateTaskTitle(task)" (blur)="cancelEditing(task)" #titleInput (focus)="titleInput.select()" />
+                            </mat-form-field>
+                        </ng-template>
+                      <p class="created_at">{{ task.createdAt }}</p>
+                    </mat-card-content>
+                    <mat-card-actions>
+                        <button mat-button color="warn" (click)="deleteTask(task.id)">X</button>
+                    </mat-card-actions>
+                </mat-card>
+            </div>
+        </div>
+    </div>   
+</div>
