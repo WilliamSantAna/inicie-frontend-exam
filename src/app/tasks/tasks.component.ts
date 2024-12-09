@@ -3,50 +3,34 @@ import { CommonModule } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-
-
-interface Task {
-  id: number;
-  title: string;
-  createdAt: string;
-  status: string;
-  isEditing: boolean;
-}
+import { HttpClientModule } from '@angular/common/http';
+import { Task, TaskService } from '../services/task.service';
 
 @Component({
   selector: 'app-tasks',
   standalone: true,
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.css'],
-  imports: [CommonModule, DragDropModule, MatCardModule, MatButtonModule, FormsModule, MatFormFieldModule, MatInputModule]
+  imports: [CommonModule, DragDropModule, MatCardModule, MatButtonModule, FormsModule, MatFormFieldModule, MatInputModule, HttpClientModule]
 })
 export class TasksComponent {
   tasks: Task[] = [];
 
-  constructor() {
+  constructor(private taskService: TaskService) {}
+
+  ngOnInit(): void {
     this.loadTasks();
   }
 
-  loadTasks(): any {
-    this.tasks = [
-      { id: 1, title: 'Design da homepage', createdAt: '06/12/2024 08:13', status: 'pending', isEditing: false },
-      { id: 2, title: 'Criar layout do painel', createdAt: '06/12/2024 10:45', status: 'pending', isEditing: false },
-      { id: 3, title: 'Testar integração com pagamento', createdAt: '06/12/2024 14:20', status: 'pending', isEditing: false },
-      { id: 4, title: 'Corrigir bug no login', createdAt: '06/12/2024 09:00', status: 'in-progress', isEditing: false },
-      { id: 6, title: 'Corrigir erro no relatório', createdAt: '06/12/2024 15:00', status: 'in-progress', isEditing: false },
-      { id: 7, title: 'Escrever documentação', createdAt: '05/12/2024 14:30', status: 'completed', isEditing: false },
-      { id: 8, title: 'Implementar autenticação', createdAt: '06/12/2024 13:15', status: 'completed', isEditing: false },
-      { id: 9, title: 'Ajustar responsividade', createdAt: '06/12/2024 16:10', status: 'completed', isEditing: false },
-      { id: 10, title: 'Migrar banco de dados', createdAt: '06/12/2024 19:00', status: 'completed', isEditing: false },
-    ];
+  async loadTasks() {
+    this.tasks = await this.taskService.getTasks();
   }
 
-  getTask(id: number): any {
-    return this.tasks.find(t => t.id === id);    
+  getTask(id: number): Task {
+    return this.tasks.find(t => t.id === id)!;
   }
 
   get pendingTasks(): Task[] {
@@ -61,87 +45,60 @@ export class TasksComponent {
     return this.tasks.filter(task => task.status === 'completed');
   }
 
-  selectEnabledEditing(event: Event): void {
-    const inputElement = (event.target as HTMLElement).parentElement?.querySelector('input') as HTMLInputElement;
-    setTimeout(() => {
-      if (inputElement) {
-        inputElement.focus();
-        inputElement.select();
-      }
-    }, 50);
-  }
-
-  enableEditing(task: any, event: Event): void {
-    task.isEditing = true;
-    this.selectEnabledEditing(event);
-  }
-
-  updateTaskTitle(task: any): void {
+  async updateTaskTitle(task: any): Promise<void> {
     if (task.title.trim() === '') {
       alert('O título da tarefa não pode estar vazio.');
     } else {
-      task.isEditing = false;
+      await this.taskService.updateTask(task);
+      this.cancelEditing(task);
     }
   }
 
-  cancelEditing(task: any): void {
+  enableEditing(task: Task): void {
+    this.tasks.forEach(task => this.cancelEditing(task));
+    task.isEditing = true;
+  }
+
+  cancelEditing(task: Task): void {
     task.isEditing = false;
   }
 
-  moveTo(status: string, task: Task): void {
+  async moveTo(status: string, task: Task) {
     task.status = status;
+    await this.taskService.updateTask(task);
+    await this.loadTasks();
   }
   
-  addTask() {
-    const newTask = {
-      id: this.generateId(),
-      title: 'Nova tarefa',
-      createdAt: this.getCurrentDateTime(),
-      status: 'pending',
-      isEditing: false
-    };
-    this.tasks.push(newTask);
+  async addTask() {
+    const task: Task = { title: 'Nova Tarefa', status: 'pending' };
+    await this.taskService.createTask(task);
+    await this.loadTasks();
+    this.enableEditing(task);
   }
 
-  private getCurrentDateTime(): string {
-    const now = new Date();
-    const options: Intl.DateTimeFormatOptions = {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    };
-    return now.toLocaleDateString('pt-BR', options);
-  }
-
-  private generateId(): number {
-    const allTasks = [...this.pendingTasks, ...this.inProgressTasks, ...this.completedTasks];
-    return allTasks.length ? Math.max(...allTasks.map(task => task.id)) + 1 : 1;
-  }  
-
-  deleteTask(taskId: number): void {
+  async deleteTask(taskId: any) {
     if (window.confirm('Certeza que deseja apagar esta tarefa?\nEsta ação não pode ser desfeita')) {
-      this.tasks = this.tasks.filter(task => task.id !== taskId);
+      await this.taskService.deleteTask(taskId);
+      await this.loadTasks();
     }
   }
   
-  drop(event: any) {
+  async drop(event: any) {
     const fromList = event.previousContainer.element.nativeElement.className;
     const toList = event.container.element.nativeElement.className;
     const task = this.getTask(event.item.data.id);
 
     if (fromList.indexOf('pending') > -1 && toList.indexOf('in-progress') > -1) {
-      return this.moveTo('in-progress', task);
+      return await this.moveTo('in-progress', task);
     }
     if (fromList.indexOf('in-progress') > -1 && toList.indexOf('completed') > -1) {
-      return this.moveTo('completed', task);
+      return await this.moveTo('completed', task);
     }
     if (fromList.indexOf('completed') > -1 && toList.indexOf('in-progress') > -1) {
-      return this.moveTo('in-progress', task);
+      return await this.moveTo('in-progress', task);
     }
     if (fromList.indexOf('in-progress') > -1 && toList.indexOf('pending') > -1) {
-      return this.moveTo('pending', task);
+      return await this.moveTo('pending', task);
     }
   }
 }

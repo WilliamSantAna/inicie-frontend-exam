@@ -43,9 +43,9 @@ body, html {
     justify-content: center;
     align-items: center;
     align-content: center;
-    background-color: #7697c8;
+    background-color: #fff;
     padding: 20px 10px;
-    color: #ffffff;
+    color: #4e73b8;
 	border-radius: 10px 10px 0 0;
 }
 
@@ -65,9 +65,8 @@ body, html {
 
 .kanban-column {
     width: 390px;
-    background: #f1f8ff; /* Azul muito claro */
+    background: #fff;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 15px;
     max-height: 100%;
     overflow-y: auto;
@@ -83,15 +82,15 @@ body, html {
 }
 
 .pending-column h2 {
-    background-color: #d6677f; /* Azul padrão */
+    background-color: #d6677f;
 }
 
 .in-progress-column h2 {
-    background-color: #b4b63a; /* Azul médio */
+    background-color: #b4b63a;
 }
 
 .completed-column h2 {
-    background-color: #3cbd76; /* Azul claro */
+    background-color: #3cbd76;
 }
 
 .task-list {
@@ -100,8 +99,21 @@ body, html {
     margin: 0;
 }
 
+.pending-column .task {
+    background-color: #fff7fa !important;
+}
+
+.in-progress-column .task {
+    background-color: #fffcf5 !important;
+}
+
+.completed-column .task {
+    background-color: #f0fcff !important;
+}
+
+
 .task {
-    background-color: #ffffff;
+    background-color: #dfecff;
     border: 1px solid #d0e7ff;
     border-radius: 6px;
     padding: 10px 0px;
@@ -227,4 +239,8 @@ body, html {
     display: block;
     padding: 0 0 0 16px;
     width: 100%;
+}
+
+.mat-mdc-text-field-wrapper {
+    background-color: #fff !important; 
 }

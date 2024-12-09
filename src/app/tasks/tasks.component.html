@@ -14,14 +14,14 @@
                 <mat-card *ngFor="let task of pendingTasks" cdkDrag [cdkDragData]="task" class="task">
                     <mat-card-content>
                         <ng-container *ngIf="!task.isEditing; else editMode">
-                            <h3 (click)="enableEditing(task, $event)">{{ task.title }}</h3>
+                            <h3 (click)="enableEditing(task)">{{ task.title }}</h3>
                         </ng-container>
                         <ng-template #editMode>
                             <mat-form-field appearance="outline" class="full-width">
                                 <input matInput [(ngModel)]="task.title" (keydown.enter)="updateTaskTitle(task)" (blur)="cancelEditing(task)" #titleInput (focus)="titleInput.select()" />
                             </mat-form-field>
                         </ng-template>
-                        <p class="created_at">{{ task.createdAt }}</p>
+                        <p class="created_at">{{ task.created_at | date:'dd/MM/yyyy HH:mm' }}</p>
                     </mat-card-content>
                     <mat-card-actions>
                         <button mat-button color="danger" (click)="deleteTask(task.id)">X</button>
@@ -42,14 +42,14 @@
                 <mat-card *ngFor="let task of inProgressTasks" cdkDrag [cdkDragData]="task" class="task">
                     <mat-card-content>
                         <ng-container *ngIf="!task.isEditing; else editMode">
-                            <h3 (click)="enableEditing(task, $event)">{{ task.title }}</h3>
+                            <h3 (click)="enableEditing(task)">{{ task.title }}</h3>
                         </ng-container>
                         <ng-template #editMode>
                             <mat-form-field appearance="outline" class="full-width">
                                 <input matInput [(ngModel)]="task.title" (keydown.enter)="updateTaskTitle(task)" (blur)="cancelEditing(task)" #titleInput (focus)="titleInput.select()" />
                             </mat-form-field>
                         </ng-template>
-                      <p class="created_at">{{ task.createdAt }}</p>
+                      <p class="created_at">{{ task.created_at | date:'dd/MM/yyyy HH:mm' }}</p>
                     </mat-card-content>
                     <mat-card-actions>
                         <button mat-button color="warn" (click)="deleteTask(task.id)">X</button>
@@ -67,14 +67,14 @@
                 <mat-card *ngFor="let task of completedTasks" cdkDrag [cdkDragData]="task" class="task">
                     <mat-card-content>
                         <ng-container *ngIf="!task.isEditing; else editMode">
-                            <h3 (click)="enableEditing(task, $event)">{{ task.title }}</h3>
+                            <h3 (click)="enableEditing(task)">{{ task.title }}</h3>
                         </ng-container>
                         <ng-template #editMode>
                             <mat-form-field appearance="outline" class="full-width">
                                 <input matInput [(ngModel)]="task.title" (keydown.enter)="updateTaskTitle(task)" (blur)="cancelEditing(task)" #titleInput (focus)="titleInput.select()" />
                             </mat-form-field>
                         </ng-template>
-                      <p class="created_at">{{ task.createdAt }}</p>
+                      <p class="created_at">{{ task.created_at | date:'dd/MM/yyyy HH:mm' }}</p>
                     </mat-card-content>
                     <mat-card-actions>
                         <button mat-button color="warn" (click)="deleteTask(task.id)">X</button>
