@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment';
 })
 export class ApiService {
     private axiosInstance: AxiosInstance;
-    private apiUrl: string = 'http://localhost:8080/';
+    private apiUrl: string = `${environment.apiBaseUrl}`;
 
     constructor() {
         this.axiosInstance = axios.create({
